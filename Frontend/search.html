@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>Search Results</title>
+</head>
+<body>
+  <h2 id="search-title">Search Results</h2>
+
+  <h3>Matching Students</h3>
+  <ul id="student-results"></ul>
+
+  <h3>Matching Faculties</h3>
+  <ul id="faculty-results"></ul>
+
+<script>
+const urlParams = new URLSearchParams(window.location.search);
+const query = urlParams.get('query');
+document.getElementById('search-title').textContent = `Search Results for "${query}"`;
+
+async function fetchSearchResults() {
+  try {
+    const res = await fetch(`http://127.0.0.1:5000/search?query=${encodeURIComponent(query)}`);
+    const data = await res.json();
+
+    const sList = document.getElementById('student-results');
+    const fList = document.getElementById('faculty-results');
+
+    if (data.students && data.students.length > 0) {
+      data.students.forEach(student => {
+        sList.insertAdjacentHTML('beforeend', `<li>${student.studentname} (ID: ${student.studentid}) - Faculty ID: ${student.facultyid}</li>`);
+      });
+    } else {
+      sList.innerHTML = '<li>No matching students found.</li>';
+    }
+
+    if (data.faculties && data.faculties.length > 0) {
+      data.faculties.forEach(faculty => {
+        fList.insertAdjacentHTML('beforeend', `<li>${faculty.facultyname} - ${faculty.facultyemail}</li>`);
+      });
+    } else {
+      fList.innerHTML = '<li>No matching faculty found.</li>';
+    }
+
+  } catch (err) {
+    console.error('Search error:', err);
+  }
+}
+
+fetchSearchResults();
+</script>
+</body>
+</html>

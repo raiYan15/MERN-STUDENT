@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Admin Dashboard</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+<div id="admin-dashboard" class="dashboard-container">
+  <div class="container">
+
+    <!-- Dashboard Header -->
+    <div class="dashboard-header">
+      <h1>Admin Dashboard</h1>
+      <button class="logout-btn btn-outline" onclick="window.location.href='index.html';">Logout</button>
+    </div>
+
+    <!-- Admin Action Buttons -->
+    <div class="admin-actions">
+      <a href="addstudent.html" class="btn-primary">Add Student</a>
+      <a href="addfacult.html" class="btn-secondary">Add Faculty</a>
+      <a href="edit.html" class="btn-outline">Edit Students</a>
+      <a href="editfaculity.html" class="btn-outline">Edit Faculty</a>
+    </div>
+
+    <!-- Students Table -->
+    <div class="table-container">
+      <h2>Students</h2>
+      <table class="table-styled">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Faculty ID</th>
+          </tr>
+        </thead>
+        <tbody id="student-table-body"></tbody>
+      </table>
+    </div>
+
+    <!-- Faculty Table -->
+    <div class="table-container">
+      <h2>Faculty</h2>
+      <table class="table-styled">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Email</th>
+          </tr>
+        </thead>
+        <tbody id="faculty-table-body"></tbody>
+      </table>
+    </div>
+
+  </div>
+</div>
+
+<script>
+async function fetchAndRender() {
+  try {
+    const [studentsRes, facsRes] = await Promise.all([
+      fetch('http://127.0.0.1:5000/viewallstudents'),
+      fetch('http://127.0.0.1:5000/viewallfaculties')
+    ]);
+    const students = await studentsRes.json();
+    const faculties = await facsRes.json();
+
+    const sBody = document.getElementById('student-table-body');
+    students.forEach(s => {
+      sBody.insertAdjacentHTML('beforeend', `
+        <tr>
+          <td>${s.studentid}</td>
+          <td>${s.studentname}</td>
+          <td>${s.facultyid}</td>
+        </tr>
+      `);
+    });
+
+    const fBody = document.getElementById('faculty-table-body');
+    faculties.forEach(f => {
+      fBody.insertAdjacentHTML('beforeend', `
+        <tr>
+          <td>${f.facultyid}</td>
+          <td>${f.facultyname}</td>
+          <td>${f.facultyemail}</td>
+        </tr>
+      `);
+    });
+  } catch (err) {
+    console.error('Error fetching data:', err);
+  }
+}
+
+document.addEventListener('DOMContentLoaded', fetchAndRender);
+</script>
+
+</body>
+</html>

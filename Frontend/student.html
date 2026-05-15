@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Student Dashboard</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="header-container">
+    <div class="logo-container">
+      <img src="https://img.icons8.com/color/48/000000/student-male.png" alt="Logo" class="logo" />
+      <h1 class="site-title">Student Dashboard</h1>
+    </div>
+    <nav>
+      <ul class="nav-links">
+        <li><button id="download-report" class="btn-outline">Download Report</button></li>
+        <li><button id="view-pie-chart" class="btn-outline">View Progress</button></li>
+        <li><button id="logout-btn" class="btn-primary">Logout</button></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main class="dashboard-container container">
+    <!-- Student Info -->
+    <section class="card" id="student-info">
+      <h3>Student Information</h3>
+      <p><strong>Name:</strong> <span id="student-name"></span></p>
+      <p><strong>Email:</strong> <span id="student-email"></span></p>
+      <p><strong>Faculty:</strong> <span id="faculty-name"></span></p>
+    </section>
+
+    <!-- To-Do Table -->
+    <section class="card" id="todo-section">
+      <h3>To-Do List</h3>
+      <table class="styled-table" id="todo-table">
+        <thead>
+          <tr>
+            <th>Task</th>
+            <th>Description</th>
+            <th>Status</th>
+            <th>Update</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Rows filled by JS -->
+        </tbody>
+      </table>
+    </section>
+
+    <!-- Progress Notes -->
+    <section class="card" id="progress-section">
+      <h3>Progress Notes</h3>
+      <div id="progress-notes-container"></div>
+    </section>
+  </main>
+
+  <footer class="footer-container">
+    <div>
+      <h4>Happy Kids Daycare</h4>
+      <p>123 Sunshine Avenue, Happyville, HV 12345</p>
+      <p>Email: support@happykidsdaycare.com | Phone: (123) 456-7890</p>
+      <p>&copy; <span id="current-year"></span> Happy Kids Daycare. All rights reserved.</p>
+    </div>
+  </footer>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const studentId = localStorage.getItem("studentid");
+      if (!studentId) {
+        alert("Student ID missing. Please login.");
+        window.location.href = "index.html";
+        return;
+      }
+
+      // Fetch student info, including faculty name from your backend
+      fetch(`http://localhost:5000/student_details/${studentId}`)
+        .then(res => {
+          if (!res.ok) throw new Error("Failed to fetch student info");
+          return res.json();
+        })
+        .then(data => {
+          document.getElementById("student-name").textContent = data.studentname || "N/A";
+          document.getElementById("student-email").textContent = data.studentmail || "N/A";
+          // Faculty name comes from faculty table via backend join
+          document.getElementById("faculty-name").textContent = data.facultyname || "N/A";
+        })
+        .catch(() => {
+          alert("Failed to load student info.");
+        });
+
+      // Fetch To-Do list for the student
+      fetch(`http://localhost:5000/get_todos/${studentId}`)
+        .then(res => res.json())
+        .then(todos => {
+          const tbody = document.querySelector("#todo-table tbody");
+          tbody.innerHTML = "";
+          if (todos.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="4">No To-Do tasks assigned.</td></tr>`;
+            return;
+          }
+          todos.forEach(todo => {
+            const tr = document.createElement("tr");
+            tr.innerHTML = `
+              <td>${todo.task_title || todo.task_description || "N/A"}</td>
+              <td>${todo.task_description || ""}</td>
+              <td>${todo.status || "not completed"}</td>
+              <td>
+                <select data-todo-id="${todo.serial_number}" class="status-select">
+                  <option value="not completed" ${todo.status === "not completed" ? "selected" : ""}>Not Completed</option>
+                  <option value="in progress" ${todo.status === "in progress" ? "selected" : ""}>In Progress</option>
+                  <option value="completed" ${todo.status === "completed" ? "selected" : ""}>Completed</option>
+                </select>
+              </td>
+            `;
+            tbody.appendChild(tr);
+          });
+
+          // Attach change listeners for status update
+          document.querySelectorAll(".status-select").forEach(select => {
+            select.addEventListener("change", event => {
+              const newStatus = event.target.value;
+              const todoId = event.target.getAttribute("data-todo-id");
+
+              fetch("http://localhost:5000/update_progress_status", {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  student_id: parseInt(studentId),
+                  todo_id: parseInt(todoId),
+                  status: newStatus,
+                  date: new Date().toISOString().split("T")[0] // yyyy-mm-dd
+                })
+              })
+              .then(res => {
+                if (res.ok) {
+                  alert("Status updated successfully!");
+                  event.target.parentElement.previousElementSibling.textContent = newStatus;
+                } else {
+                  alert("Failed to update status.");
+                }
+              })
+              .catch(() => alert("Error updating status."));
+            });
+          });
+        })
+        .catch(() => {
+          const tbody = document.querySelector("#todo-table tbody");
+          tbody.innerHTML = `<tr><td colspan="4">Failed to load To-Do tasks.</td></tr>`;
+        });
+
+      // Fetch all progress notes, then filter by studentId
+      fetch("http://localhost:5000/get_progress")
+        .then(res => res.json())
+        .then(data => {
+          const progressNotes = data.filter(note => note.student_id == studentId);
+          const container = document.getElementById("progress-notes-container");
+          container.innerHTML = "";
+
+          if (progressNotes.length === 0) {
+            container.textContent = "No progress notes available.";
+            return;
+          }
+
+          progressNotes.forEach(note => {
+            const noteEl = document.createElement("div");
+            noteEl.className = "progress-note card";
+            noteEl.innerHTML = `
+              <strong>Date:</strong> ${note.date}<br>
+              <strong>Task:</strong> ${note.task_description || "N/A"}<br>
+              <strong>Status:</strong> ${note.status}<br>
+            `;
+            container.appendChild(noteEl);
+          });
+        })
+        .catch(() => {
+          document.getElementById("progress-notes-container").textContent = "Failed to load progress notes.";
+        });
+
+      // Button actions
+      document.getElementById("download-report").onclick = () => {
+        window.open(`http://localhost:5000/download_todo/${studentId}`, "_blank");
+      };
+
+      document.getElementById("view-pie-chart").onclick = () => {
+        window.open(`http://localhost:5000/student_progress_pie/${studentId}`, "_blank");
+      };
+
+      document.getElementById("logout-btn").onclick = () => {
+        localStorage.removeItem("studentid");
+        window.location.href = "index.html";
+      };
+    });
+  </script>
+</body>
+</html>

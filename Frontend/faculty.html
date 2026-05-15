@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Faculty Dashboard - CRM Workflow Management</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <!-- Header -->
+  <header>
+    <div class="header-container">
+      <div class="logo-container">
+        <img src="https://img.icons8.com/office/48/workflow.png" alt="CRM Logo" class="logo" />
+        <h1 class="site-title">CRM Workflow Management</h1>
+      </div>
+      <nav>
+        <ul class="nav-links">
+          <li><a href="home.html">Home</a></li>
+          <li><a href="about.html">About</a></li>
+          <li><a href="modules.html">Modules</a></li>
+          <li><a href="index.html" class="btn-primary" id="logout-btn">Logout</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Main -->
+  <main class="dashboard-container">
+    <h1 class="page-title">Faculty Dashboard</h1>
+
+
+    <!-- Tab Controls -->
+    <div class="tabs">
+      <button class="tab-btn active btn-secondary" data-tab="students">Assigned Students</button>
+      <button class="tab-btn btn-secondary" data-tab="add-todo">Assign Task</button>
+      <button class="tab-btn btn-secondary" data-tab="todo-list">Task List</button>
+      <button class="tab-btn btn-secondary" data-tab="progress">Progress Tracker</button>
+      <button class="tab-btn btn-secondary" data-tab="settings">Settings</button>
+<a href="sendmessage.html" id="send-message-btn" class="tab-btn btn-secondary" >Send Reminder</a>
+
+    </div>
+
+    <!-- Students -->
+    <div id="students-tab" class="tab-content active program-card">
+      <table>
+        <thead>
+          <tr><th>ID</th><th>Student Name</th><th>Phone Number</th></tr>
+        </thead>
+        <tbody id="faculty-student-table">
+          <tr><td colspan="3">Loading student records...</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Add Task -->
+    <div id="add-todo-tab" class="tab-content program-card">
+      <form id="add-todo-form">
+        <label for="task_description">Task Description</label><br />
+        <textarea id="task_description" name="task_description" required></textarea><br /><br />
+
+        <label for="dead_line">Deadline</label><br />
+        <input type="datetime-local" id="dead_line" name="dead_line" required /><br /><br />
+
+        <button type="submit" class="btn-primary">Assign Task to All Students</button>
+      </form>
+    </div>
+
+    <!-- Task List -->
+    <div id="todo-list-tab" class="tab-content program-card">
+      <button id="send-message-btn" class="btn-primary" style="display: none;">Send Reminder</button>
+
+      <h3>My Assigned Tasks</h3>
+      <table>
+        <thead>
+          <tr><th>Task</th><th>Deadline</th><th>Assigned To</th><th>Download</th></tr>
+        </thead>
+        <tbody id="todo-table">
+          <tr><td colspan="4">Loading tasks...</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Progress Tracker -->
+    <div id="progress-tab" class="tab-content program-card">
+      <h3>Progress Tracker</h3>
+      <table>
+        <thead>
+          <tr><th>Student Name</th><th>Task Description</th><th>Status</th></tr>
+        </thead>
+        <tbody id="progress-table-body">
+          <tr><td colspan="3">Loading progress...</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Settings -->
+    <div id="settings-tab" class="tab-content program-card">
+      <h3>Account Settings</h3>
+      <button class="btn-secondary" onclick="window.location.href='editfacu.html'">Edit Profile</button>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer>
+    <div class="footer-container">
+      <div class="footer-logo">
+        <img src="https://img.icons8.com/office/48/workflow.png" alt="Logo" class="logo-small" />
+        <h2>CRM Workflow Management</h2>
+      </div>
+
+      <div class="footer-links">
+        <a href="home.html">Home</a>
+        <a href="about.html">About</a>
+        <a href="modules.html">Modules</a>
+        <a href="index.html">Logout</a>
+      </div>
+
+      <p>123 Business Park, Techville, TX 75001</p>
+      <p>Phone: (800) 123-4567 | Email: support@crmworkflow.com</p>
+      <p class="copyright">
+        &copy; <span id="current-year"></span> CRM Workflow Management. All rights reserved.
+      </p>
+    </div>
+  </footer>
+<script>
+  // Update footer year dynamically
+  document.getElementById('current-year').textContent = new Date().getFullYear();
+
+  const facultyId = localStorage.getItem("facultyid") || "2";
+
+  document.addEventListener('DOMContentLoaded', () => {
+    // Tab switching
+    document.querySelectorAll(".tab-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll(".tab-content").forEach(tab => tab.classList.remove("active"));
+        document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+
+        btn.classList.add("active");
+        document.getElementById(btn.dataset.tab + "-tab").classList.add("active");
+      });
+    });
+
+    loadStudentsTable();
+    loadTodoList();
+    loadProgressTable();
+
+    document.getElementById("add-todo-form").addEventListener("submit", handleAddTodo);
+document.getElementById("send-message-btn").onclick = () => {
+  window.location.href = "sendmessage.html";
+};
+
+    document.getElementById("logout-btn").addEventListener("click", () => {
+      localStorage.clear();
+    });
+  });
+
+  async function loadStudentsTable() {
+    try {
+      const res = await fetch("http://localhost:5000/viewallstudents");
+      const students = await res.json();
+      const facultyStudents = students.filter(s => s.facultyid == facultyId);
+
+      const tbody = document.getElementById("faculty-student-table");
+      if(facultyStudents.length === 0) {
+        tbody.innerHTML = "<tr><td colspan='3'>No students assigned.</td></tr>";
+        return;
+      }
+      tbody.innerHTML = facultyStudents.map(s => `
+        <tr>
+          <td>${s.studentid}</td>
+          <td>${s.studentname}</td>
+          <td>${s.studentphn}</td>
+        </tr>
+      `).join("");
+    } catch (error) {
+      console.error(error);
+      document.getElementById("faculty-student-table").innerHTML = "<tr><td colspan='3'>Error loading students.</td></tr>";
+    }
+  }
+
+async function handleAddTodo(event) {
+  event.preventDefault();
+
+  const taskDescription = document.getElementById("task_description").value.trim();
+  const deadLine = document.getElementById("dead_line").value;
+
+  if (!taskDescription || !deadLine) {
+    alert("Please fill in all fields.");
+    return;
+  }
+
+  try {
+    const response = await fetch("http://localhost:5000/assign_task_and_progress", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        faculty_id: facultyId,
+        task_description: taskDescription,
+        deadline: deadLine
+      })
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      throw new Error(result.error || "Unknown error");
+    }
+
+    alert("Task successfully assigned to all students!");
+    document.getElementById('add-todo-form').reset();
+    loadTodoList();
+    loadProgressTable();
+
+  } catch (error) {
+    console.error("❌ Failed to assign task:", error);
+    alert("Error assigning task. Please try again.");
+  }
+}
+
+  async function loadTodoList() {
+    try {
+      const res = await fetch("http://localhost:5000/view_all_todo");
+      const todos = await res.json();
+      const myTodos = todos.filter(t => t.facultyid == facultyId);
+      const studentsRes = await fetch("http://localhost:5000/viewallstudents");
+      const students = await studentsRes.json();
+
+      const tbody = document.getElementById("todo-table");
+      if(myTodos.length === 0) {
+        tbody.innerHTML = "<tr><td colspan='4'>No tasks added.</td></tr>";
+        return;
+      }
+
+      tbody.innerHTML = myTodos.map(todo => {
+        // Count students assigned to this faculty (all faculty students)
+        const assignedStudents = students.filter(s => s.facultyid == facultyId).length;
+        // Create link for download (if file link available, else #)
+        const downloadLink = todo.file_path ? `<a href="${todo.file_path}" download>Download</a>` : "N/A";
+
+        return `
+          <tr>
+            <td>${todo.task_description}</td>
+            <td>${new Date(todo.dead_line).toLocaleString()}</td>
+            <td>${assignedStudents}</td>
+            <td>${downloadLink}</td>
+          </tr>
+        `;
+      }).join("");
+    } catch (error) {
+      console.error(error);
+      document.getElementById("todo-table").innerHTML = "<tr><td colspan='4'>Error loading tasks.</td></tr>";
+    }
+  }
+
+  async function loadProgressTable() {
+    try {
+      const [studentsRes, todosRes, progressRes] = await Promise.all([
+        fetch("http://localhost:5000/viewallstudents"),
+        fetch("http://localhost:5000/view_all_todo"),
+        fetch("http://localhost:5000/get_progress")
+      ]);
+      const students = await studentsRes.json();
+      const todos = await todosRes.json();
+      const progressList = await progressRes.json();
+
+      const myStudents = students.filter(s => s.facultyid == facultyId);
+      const myStudentIds = myStudents.map(s => s.studentid);
+      const myProgress = progressList.filter(p => myStudentIds.includes(p.student_id));
+
+      const tbody = document.getElementById("progress-table-body");
+      if(myProgress.length === 0) {
+        tbody.innerHTML = "<tr><td colspan='3'>No progress data available.</td></tr>";
+        return;
+      }
+
+      tbody.innerHTML = myProgress.map(p => {
+        const student = students.find(s => s.studentid == p.student_id);
+        const todo = todos.find(t => t.serial_number == p.todo_id);
+        return `<tr data-phone="${student.studentphn}">
+                  <td>${student.studentname}</td>
+                  <td>${todo ? todo.task_description : "Task not found"}</td>
+                  <td>${p.status}</td>
+                </tr>`;
+      }).join("");
+
+      // Add click handlers for rows to store phone in localStorage
+      document.querySelectorAll("#progress-table-body tr").forEach(row => {
+        row.addEventListener("click", () => {
+          localStorage.setItem("selectedStudentPhone", row.dataset.phone);
+          document.getElementById("send-message-btn").style.display = "inline-block";
+        });
+      });
+
+    } catch (error) {
+      console.error(error);
+      document.getElementById("progress-table-body").innerHTML = "<tr><td colspan='3'>Error loading progress.</td></tr>";
+    }
+  }
+
+  function handleSendMessage() {
+    const phone = localStorage.getItem("selectedStudentPhone");
+    if(!phone) {
+      alert("Please select a student progress row first.");
+      return;
+    }
+    alert(`This would open messaging app or send SMS to: ${phone}`);
+    // Here you can implement actual SMS API integration or open SMS app if on mobile
+  }
+</script>
+</body>
+</html>

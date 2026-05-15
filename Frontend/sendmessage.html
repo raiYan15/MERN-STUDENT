@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Send WhatsApp Message</title>
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    .container {
+      max-width: 600px;
+      margin: auto;
+      padding: 20px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+    }
+    h2 {
+      text-align: center;
+    }
+    label, select, button {
+      display: block;
+      width: 100%;
+      margin: 10px 0;
+    }
+    select, button {
+      padding: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Send WhatsApp Message</h2>
+
+    <label for="task-id">Select Task:</label>
+    <select id="task-id"></select>
+
+    <label for="student-id">Select Student:</label>
+    <select id="student-id"></select>
+
+    <button id="send-btn">Send Message</button>
+  </div>
+
+<script>
+  const facultyId = localStorage.getItem("facultyid");
+
+  if (!facultyId) {
+    alert("Faculty ID not found. Please log in again.");
+    window.location.href = "index.html";
+  }
+
+  fetch(`http://localhost:5000/get_faculty_data/${facultyId}`)
+    .then(res => res.json())
+    .then(data => {
+      const taskSelect = document.getElementById("task-id");
+      const studentSelect = document.getElementById("student-id");
+
+      data.tasks.forEach(task => {
+        const option = document.createElement("option");
+        option.value = task.serial_number;
+        option.textContent = `${task.serial_number} - ${task.task_title}`;
+        taskSelect.appendChild(option);
+      });
+
+      data.students.forEach(student => {
+        const option = document.createElement("option");
+        option.value = student.studentid;
+        option.textContent = `${student.studentid} - ${student.studentname}`;
+        studentSelect.appendChild(option);
+      });
+    });
+
+  document.getElementById("send-btn").onclick = () => {
+    const taskId = document.getElementById("task-id").value;
+    const studentId = document.getElementById("student-id").value;
+
+    fetch("http://localhost:5000/send_whatsapp", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        task_id: taskId,
+        student_id: studentId
+      })
+    })
+    .then(res => res.json())
+    .then(result => {
+      alert(result.message || "Message sent!");
+    })
+    .catch(() => {
+      alert("Failed to send message.");
+    });
+  };
+</script>
+
+</body>
+</html>

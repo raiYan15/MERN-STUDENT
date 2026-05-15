@@ -1,0 +1,325 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>CRM Workflow Management System</title>
+  <link rel="stylesheet" href="styles.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&family=Open+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    .auth-toggle-group {
+      display: flex;
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+    }
+
+    .auth-toggle-btn {
+      flex: 1;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--foreground);
+      padding: 0.75rem 1rem;
+      border-radius: 9999px;
+      cursor: pointer;
+      font: inherit;
+      transition: all 0.3s;
+    }
+
+    .auth-toggle-btn.active {
+      background-color: var(--primary);
+      color: var(--primary-foreground);
+      border-color: transparent;
+    }
+
+    .auth-note {
+      margin: 0 0 1rem;
+      font-size: 0.9rem;
+      color: var(--muted-foreground);
+      text-align: center;
+    }
+
+    .auth-form {
+      display: none;
+    }
+
+    .auth-form.active {
+      display: block;
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <div class="container header-container">
+      <div class="logo-container">
+        <h1 class="site-title">TO-DO MAKE YOURSELF</h1>
+      </div>
+      <nav>
+        <ul class="nav-links">
+          <li><a href="home.html">Home</a></li>
+          <li><a href="index.html" class="btn-primary">Login</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <div class="container">
+      <section class="role-selection">
+        <h1>Welcome to TO-DO MAKE YOURSELF</h1>
+        <h2 class="gradient-text">MAKE YOURSELF RESPONSIBLE AND USEFUL</h2>
+
+        <div class="role-cards">
+          <div class="card role-card" data-role="admin">
+            <div class="role-icon">👨‍💼</div>
+            <h3>Administrator</h3>
+            <p>Manage students, faculty, and system settings</p>
+          </div>
+
+          <div class="card role-card" data-role="faculty">
+            <div class="role-icon">👩‍🏫</div>
+            <h3>Faculty</h3>
+            <p>Track student progress, update achievements</p>
+          </div>
+
+          <div class="card role-card" data-role="student">
+            <div class="role-icon">👨‍👩‍👧</div>
+            <h3>Student</h3>
+            <p>View progress, manage tasks, communicate with faculty</p>
+          </div>
+        </div>
+
+        <div id="login-form-container" class="card login-card" style="display: none;">
+          <h3 id="login-title">Login as <span id="selected-role">Role</span></h3>
+          <p class="auth-note" id="auth-note">Select Admin to sign up or log in.</p>
+
+          <div class="auth-toggle-group" id="auth-toggle-group" style="display: none;">
+            <button type="button" class="auth-toggle-btn active" id="login-toggle-btn">Login</button>
+            <button type="button" class="auth-toggle-btn" id="signup-toggle-btn">Sign Up</button>
+          </div>
+
+          <form id="login-form" class="auth-form active">
+            <div class="form-group">
+              <label for="username">Username / Email</label>
+              <input type="text" id="username" name="username" class="form-input" required />
+            </div>
+            <div class="form-group">
+              <label for="password">Password</label>
+              <input type="password" id="password" name="password" class="form-input" required />
+            </div>
+            <div class="form-row">
+              <div class="checkbox-group">
+                <input type="checkbox" id="remember" name="remember"/>
+                <label for="remember">Remember me</label>
+              </div>
+              <a href="#" class="forgot-password">Forgot password?</a>
+            </div>
+            <button type="submit" class="btn-primary btn-full">Login</button>
+          </form>
+
+          <form id="signup-form" class="auth-form">
+            <div class="form-group">
+              <label for="admin-name">Full Name</label>
+              <input type="text" id="admin-name" name="admin-name" class="form-input" required />
+            </div>
+            <div class="form-group">
+              <label for="admin-email">Email</label>
+              <input type="email" id="admin-email" name="admin-email" class="form-input" required />
+            </div>
+            <div class="form-group">
+              <label for="admin-password">Password</label>
+              <input type="password" id="admin-password" name="admin-password" class="form-input" required />
+            </div>
+            <button type="submit" class="btn-secondary btn-full">Create Admin Account</button>
+          </form>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <footer>
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-col">
+          <div class="footer-logo">
+            <img src="https://img.icons8.com/color/48/000000/task.png" alt="CRM Logo" class="logo-small"/>
+            <h2>CRM Workflow System</h2>
+          </div>
+          <p>Streamline your tasks, track progress, and manage workflows efficiently.</p>
+        </div>
+
+        <div class="footer-col">
+          <h3>Quick Links</h3>
+          <ul class="footer-links">
+            <li><a href="home.html">Home</a></li>
+            <li><a href="index.html">Login</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h3>Contact</h3>
+          <address>
+            456 Workflow Avenue<br />
+            Productivity City, PC 65432<br />
+            Phone: (321) 654-0987<br />
+            Email: support@crmworkflow.com
+          </address>
+        </div>
+      </div>
+
+      <div class="copyright">
+        <p>&copy; <span id="current-year"></span> CRM Workflow System. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      let selectedRole = null;
+      let authMode = 'login';
+
+      const loginFormContainer = document.getElementById('login-form-container');
+      const authToggleGroup = document.getElementById('auth-toggle-group');
+      const authNote = document.getElementById('auth-note');
+      const loginToggleBtn = document.getElementById('login-toggle-btn');
+      const signupToggleBtn = document.getElementById('signup-toggle-btn');
+      const loginForm = document.getElementById('login-form');
+      const signupForm = document.getElementById('signup-form');
+
+      function updateAuthView() {
+        const isAdmin = selectedRole === 'admin';
+
+        authToggleGroup.style.display = isAdmin ? 'flex' : 'none';
+        signupToggleBtn.style.display = isAdmin ? 'inline-flex' : 'none';
+        authNote.textContent = isAdmin
+          ? 'Admin accounts can log in or sign up here.'
+          : 'Signup is available for Admin accounts only.';
+
+        loginForm.classList.toggle('active', authMode === 'login');
+        signupForm.classList.toggle('active', authMode === 'signup');
+
+        loginToggleBtn.classList.toggle('active', authMode === 'login');
+        signupToggleBtn.classList.toggle('active', authMode === 'signup');
+      }
+
+      document.querySelectorAll('.role-card').forEach(card => {
+        card.addEventListener('click', () => {
+          selectedRole = card.dataset.role;
+          authMode = 'login';
+          loginForm.reset();
+          signupForm.reset();
+          loginFormContainer.style.display = 'block';
+          document.getElementById('selected-role').textContent = selectedRole.charAt(0).toUpperCase() + selectedRole.slice(1);
+          updateAuthView();
+        });
+      });
+
+      loginToggleBtn.addEventListener('click', () => {
+        if (selectedRole !== 'admin') return;
+        authMode = 'login';
+        updateAuthView();
+      });
+
+      signupToggleBtn.addEventListener('click', () => {
+        if (selectedRole !== 'admin') return;
+        authMode = 'signup';
+        updateAuthView();
+      });
+
+      loginForm.addEventListener('submit', async function (event) {
+        event.preventDefault();
+
+        const email = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+
+        let url = '';
+        let body = {};
+
+        if (selectedRole === 'admin') {
+          url = 'http://localhost:5000/adminlogin';
+          body = { adminemail: email, adminpass: password };
+        } else if (selectedRole === 'faculty') {
+          url = 'http://localhost:5000/facultylogin';
+          body = { facultyemail: email, facultypass: password };
+        } else if (selectedRole === 'student') {
+          url = 'http://localhost:5000/studentlogin';
+          body = { studentemail: email, studentpassword: password };
+        } else {
+          alert('Please select a role before logging in.');
+          return;
+        }
+
+        try {
+          const response = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body)
+          });
+
+          const data = await response.json();
+
+          if (response.ok) {
+            alert('Login successful!');
+            
+            if (selectedRole === 'admin') {
+              window.location.href = 'admin.html';
+            } else if (selectedRole === 'faculty') {
+              localStorage.setItem("facultyid", data.facultyid);
+              window.location.href = 'faculty.html';
+            } else if (selectedRole === 'student') {
+              localStorage.setItem("studentid", data.studentid);
+              window.location.href = 'student.html';
+            }
+          } else {
+            alert(data.message || 'Login failed: Wrong credentials');
+          }
+        } catch (err) {
+          console.error('Error:', err);
+          alert('An error occurred during login');
+        }
+      });
+
+      signupForm.addEventListener('submit', async function (event) {
+        event.preventDefault();
+
+        if (selectedRole !== 'admin') {
+          alert('Signup is only available for the Admin role.');
+          return;
+        }
+
+        const name = document.getElementById('admin-name').value.trim();
+        const email = document.getElementById('admin-email').value.trim();
+        const password = document.getElementById('admin-password').value;
+
+        try {
+          const response = await fetch('http://localhost:5000/adminregister', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              adminname: name,
+              adminemail: email,
+              adminpass: password
+            })
+          });
+
+          const data = await response.json();
+
+          if (response.ok) {
+            alert('Admin account created successfully. You can log in now.');
+            signupForm.reset();
+            authMode = 'login';
+            updateAuthView();
+          } else {
+            alert(data.message || 'Signup failed');
+          }
+        } catch (err) {
+          console.error('Signup error:', err);
+          alert('An error occurred during signup');
+        }
+      });
+
+      document.getElementById("current-year").textContent = new Date().getFullYear();
+    });
+  </script>
+</body>
+</html>

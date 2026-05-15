@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Edit Student</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .form-wrapper {
+      max-width: 550px;
+      margin: 50px auto;
+      background: #fff;
+      padding: 2rem;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    }
+
+    h2 {
+      text-align: center;
+      color: #2c3e50;
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: 500;
+    }
+
+    input[type="text"],
+    input[type="email"] {
+      width: 100%;
+      padding: 8px;
+      font-size: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+
+    .btn-primary,
+    .btn-secondary {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .btn-primary {
+      background-color: #e74c3c;
+      color: white;
+    }
+
+    .btn-secondary {
+      background-color: #3498db;
+      color: white;
+    }
+
+    .btn-primary:hover,
+    .btn-secondary:hover {
+      opacity: 0.9;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="form-wrapper">
+    <h2>Edit Student Details</h2>
+
+    <div class="form-group">
+      <label for="student_id">Enter Student ID:</label>
+      <input type="text" id="student_id">
+    </div>
+    <button class="btn-secondary" onclick="loadStudentData()">Load Data</button>
+
+    <form id="editStudentForm" style="display:none; margin-top: 20px;">
+      <div class="form-group">
+        <label for="studentname">Student Name:</label>
+        <input type="text" id="studentname" required>
+      </div>
+      <div class="form-group">
+        <label for="studentmail">Student Email:</label>
+        <input type="email" id="studentmail" required>
+      </div>
+      <div class="form-group">
+        <label for="studentphn">Student Phone:</label>
+        <input type="text" id="studentphn" required>
+      </div>
+      <div class="form-group">
+        <label for="facultyid">Faculty ID:</label>
+        <input type="text" id="facultyid" required>
+      </div>
+      <button type="submit" class="btn-primary">Update</button>
+    </form>
+  </div>
+
+  <script>
+    function loadStudentData() {
+      const studentId = document.getElementById("student_id").value.trim();
+      if (!studentId) return alert("Please enter Student ID");
+
+      fetch("http://localhost:5000/viewallstudents")
+        .then(res => res.json())
+        .then(data => {
+          const student = data.find(s => s.studentid == studentId);
+          if (student) {
+            document.getElementById("studentname").value = student.studentname;
+            document.getElementById("studentmail").value = student.studentmail;
+            document.getElementById("studentphn").value = student.studentphn;
+            document.getElementById("facultyid").value = student.facultyid;
+            document.getElementById("editStudentForm").style.display = "block";
+          } else {
+            alert("Student ID not found");
+          }
+        });
+    }
+
+    document.getElementById("editStudentForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+
+      const studentId = document.getElementById("student_id").value.trim();
+      const payload = {
+        studentname: document.getElementById("studentname").value,
+        studentmail: document.getElementById("studentmail").value,
+        studentphn: document.getElementById("studentphn").value,
+        facultyid: document.getElementById("facultyid").value
+      };
+
+      fetch(`http://localhost:5000/edit_student/${studentId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      })
+      .then(res => res.json())
+      .then(data => {
+        alert(data.message || "Student updated.");
+        window.location.href = 'admin.html'
+      })
+      .catch(err => console.error("Error updating student:", err));
+    });
+  </script>
+</body>
+</html>

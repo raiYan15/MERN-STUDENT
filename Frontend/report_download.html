@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Download Report</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="container">
+    <h2>Download Progress Report</h2>
+    <button id="download-btn" class="btn-primary">Download PDF</button>
+  </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const parentid = localStorage.getItem("parentid");
+
+      document.getElementById("download-btn").addEventListener("click", () => {
+        fetch(`http://localhost:5000/download_report/${parentid}`)
+          .then(response => response.blob())
+          .then(blob => {
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = "progress_report.pdf";
+            a.click();
+          });
+      });
+    });
+  </script>
+</body>
+</html>

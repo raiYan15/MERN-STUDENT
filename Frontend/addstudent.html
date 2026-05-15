@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="styles.css" />
+  <title>Add Student</title>
+</head>
+<body>
+
+<!-- Modal visible without script -->
+<div id="add-student-modal" class="modal" style="display: block;">
+  <div class="modal-content">
+    <!-- Close button with redirect -->
+    <span class="close-modal" onclick="window.location.href='admin.html';" style="cursor: pointer;">&times;</span>
+    <h2>Add New Student</h2>
+    <form id="add-student-form">
+      <div class="form-group">
+        <label for="student-name">Name</label>
+        <input type="text" id="student-name" name="studentname" class="form-input" required />
+      </div>      
+
+      <div class="form-group">
+        <label for="studentemail">Student Email</label>
+        <input type="email" id="studentemail" name="studentemail" class="form-input" required />
+      </div>
+
+      <div class="form-group">
+        <label for="studentpassword">Student Password</label>
+        <input type="password" id="studentpassword" name="studentpassword" class="form-input" required />
+      </div>
+
+      <div class="form-group">
+        <label for="studentphn">Phone Number</label>
+        <input type="int" id="studentphn" name="studentphn" class="form-input" required />
+      </div>
+
+<div class="form-group">
+  <label for="facultyname">Faculty Name</label>
+  <input type="text" id="facultyname" name="facultyname" class="form-input" list="faculty-list" required />
+  <datalist id="faculty-list"></datalist>
+</div>
+
+      
+
+      <button type="submit" class="btn-primary btn-full">Add Student</button>
+    </form>
+  </div>
+</div>
+
+<script>
+  let facultyMap = {}; // Maps faculty names to their IDs
+
+  // Fetch all faculties and populate datalist
+  fetch('http://127.0.0.1:5000/viewallfaculties')
+    .then(response => response.json())
+    .then(faculties => {
+      const datalist = document.getElementById('faculty-list');
+      faculties.forEach(faculty => {
+        const option = document.createElement('option');
+        option.value = faculty.facultyname; // visible name
+        datalist.appendChild(option);
+        facultyMap[faculty.facultyname] = faculty.facultyid; // mapping
+      });
+    })
+    .catch(error => {
+      console.error('Error loading faculty list:', error);
+    });
+
+  // Submit form handler
+  document.getElementById('add-student-form').addEventListener('submit', async function (e) {
+    e.preventDefault();
+
+    const studentname     = document.getElementById('student-name').value;
+    const studentemail    = document.getElementById('studentemail').value;
+    const studentpassword = document.getElementById('studentpassword').value;
+    const studentphn      = document.getElementById('studentphn').value;
+    const facultyname     = document.getElementById('facultyname').value;
+    const facultyid       = facultyMap[facultyname]; // get faculty ID from name
+
+    if (!facultyid) {
+      alert("Invalid faculty name. Please select from suggestions.");
+      return;
+    }
+
+    try {
+      const res = await fetch('http://127.0.0.1:5000/add_student', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          studentname: studentname,
+          studentemail: studentemail,
+          studentpassword: studentpassword,
+          studentphn: studentphn,
+          facultyid: facultyid
+        })
+      });
+
+      let data;
+      try {
+        data = await res.json();
+      } catch (jsonErr) {
+        throw new Error("Server returned invalid JSON or empty response.");
+      }
+
+      if (res.ok) {
+        alert('Student added successfully!');
+        window.location.href = 'admin.html';
+      } else {
+        alert('Error: ' + (data.error || data.message || 'Unknown error occurred'));
+      }
+
+    } catch (err) {
+      console.error(err);
+      alert('An unexpected error occurred: ' + err.message);
+    }
+  });
+</script>
+
+
+</body>
+</html>

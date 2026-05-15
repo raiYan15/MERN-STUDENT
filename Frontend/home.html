@@ -1,0 +1,192 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Home | Happy Kids Daycare - Nurturing Young Minds</title>
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&family=Open+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+<style>
+    /* Additional CSS to complement your provided styles.css */
+    
+    /* Hero Section */
+    .hero {
+      background: linear-gradient(to right, #fce3ff, #fdeff9);
+      padding: 4rem 2rem;
+      text-align: center;
+    }
+    .hero .hero-content h1 {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+      color: var(--foreground);
+    }
+    .hero .hero-content p {
+      font-size: 1.2rem;
+      max-width: 600px;
+      margin: 0 auto 2rem;
+      color: var(--muted-foreground);
+    }
+    .btn-hero {
+      background-color: var(--accent);
+      color: var(--accent-foreground);
+      font-weight: 600;
+      padding: 0.75rem 1.5rem;
+      border-radius: 9999px;
+      text-decoration: none;
+      transition: all 0.3s;
+      display: inline-block;
+    }
+    .btn-hero:hover {
+      background-color: var(--primary);
+    }
+    
+    /* Marquee Section */
+    .marquee-container {
+      overflow-x: auto;
+      white-space: nowrap;
+      padding: 1rem 0;
+      background-color: var(--muted);
+    }
+    .marquee-content img {
+      height: 150px;
+      margin: 0 1rem;
+      border-radius: var(--radius);
+      object-fit: cover;
+    }
+    
+    /* Features Section */
+    .features {
+      padding: 4rem 2rem;
+      text-align: center;
+    }
+    .section-title {
+      font-size: 2rem;
+      margin-bottom: 2rem;
+      color: var(--foreground);
+    }
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 2rem;
+      margin-top: 2rem;
+    }
+    .feature-card {
+      background: var(--background);
+      padding: 2rem;
+      border-radius: var(--radius);
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+      transition: all 0.3s;
+    }
+    .feature-card:hover {
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+    }
+    .feature-icon {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+    }
+    .feature-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      color: var(--foreground);
+    }
+    
+    /* Footer tweaks (if needed) */
+    .footer-container {
+      padding: 2rem;
+      background-color: var(--muted);
+      text-align: center;
+    }
+    .footer-links a {
+      margin: 0 0.5rem;
+      color: var(--muted-foreground);
+      transition: color 0.3s;
+    }
+    .footer-links a:hover {
+      color: var(--primary);
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-container">
+      <div class="logo-container">
+        
+        <h1 class="site-title">.    TO-DO MAKE YOURSELF</h1>
+      </div>
+      <nav>
+        <ul class="nav-links">
+          <li><a href="home.html" class="active">Home</a></li>
+          <li><a href="index.html" class="btn-primary">Login</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="hero-content">
+      <h1>Welcome to TO-DO MAKE YOURSELF</h1>
+      <p>Where you can trust on us - Manage your timetable</p>
+      <a href="index.html" class="btn-hero">Login</a>
+    </div>
+  </section>
+
+  <section class="features">
+    <h2 class="section-title">Features</h2>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon"></div>
+        <h3 class="feature-title">Time Management</h3>
+        <p>We make you to know the details in the time the trust you embidded in us make you a good scorer</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon"></div>
+        <h3 class="feature-title">Facuilty Management</h3>
+        <p>Full support from the teachers in the doubt clarification</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon"></div>
+        <h3 class="feature-title">Work Analysis</h3>
+        <p>Pictorical representation of the results easy for the comparision</p>
+      </div>
+    </div>
+  </section>
+
+
+
+  <footer>
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-col">
+          <div class="footer-logo">
+            <h2>TO-DO MAKE YOURSELF</h2>
+          </div>
+          <p>MAKE YOURSELF RESPONSIBLE AND USEFUL</p>
+        </div>
+
+        <div class="footer-col">
+          <h3>Quick Links</h3>
+          <ul class="footer-links">
+            <li><a href="home.html">Home</a></li>           
+            <li><a href="index.html">login</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h3>Contact</h3>
+          <address>
+          Vignan University<br />
+          Vadlamudi,Guntur<br />
+          Andhra Pradesh, India<br />          
+         
+          </address>
+        </div>
+      </div>
+
+      <div class="copyright">
+        <p>&copy; <span id="current-year"></span> TO-DO MAKE YOUSELF. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>

@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Edit Faculty</title>
+  <link rel="stylesheet" href="styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&family=Open+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    .form-group { margin-bottom: 15px; }
+    label { display: block; margin-bottom: 5px; font-weight: 500; }
+    input[type="text"], input[type="email"] {
+      width: 100%; padding: 8px; border: 1px solid #ccc;
+      border-radius: 6px; font-size: 1rem;
+    }
+    .btn-primary, .btn-secondary {
+      padding: 10px 20px; border: none; border-radius: 6px;
+      font-weight: 600; cursor: pointer;
+    }
+    .btn-primary { background-color: #e74c3c; color: white; }
+    .btn-secondary { background-color: #3498db; color: white; }
+    .form-wrapper {
+      max-width: 500px; margin: 50px auto; padding: 2rem;
+      background: #fff; border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    }
+    h2 { text-align: center; color: #2c3e50; }
+  </style>
+</head>
+<body>
+
+  <div class="form-wrapper">
+    <h2>Edit Faculty</h2>
+
+    <form id="editFacultyForm">
+      <div class="form-group">
+        <label for="name">Name:</label>
+        <input type="text" id="name" required>
+      </div>
+      <div class="form-group">
+        <label for="email">Email:</label>
+        <input type="email" id="email" required>
+      </div>
+      
+      <button type="submit" class="btn-primary">Update</button>
+    </form>
+  </div>
+
+
+  <script>
+    const facultyId = localStorage.getItem("facultyid");
+
+    if (!facultyId) {
+      alert("No faculty ID found. Please log in again.");
+      window.location.href = "index.html";
+    }
+
+    // Load faculty data from backend
+    window.onload = () => {
+      fetch("http://localhost:5000/viewallfaculties")
+        .then(res => res.json())
+        .then(data => {
+          const faculty = data.find(f => String(f.facultyid) === String(facultyId));
+          if (faculty) {
+            document.getElementById("name").value = faculty.facultyname;
+            document.getElementById("email").value = faculty.facultyemail;
+          } else {
+            alert("Faculty not found.");
+          }
+        })
+        .catch(err => {
+          console.error("Error fetching faculty data:", err);
+          alert("Error loading faculty data.");
+        });
+    };
+
+    // Submit updated faculty data
+    document.getElementById("editFacultyForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+
+      fetch(`http://localhost:5000/edit_faculty/${facultyId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          facultyname: document.getElementById("name").value,
+          facultyemail: document.getElementById("email").value
+        })
+      })
+      .then(res => res.json())
+      .then(data => {
+        alert(data.message || "Faculty profile updated.");
+      })
+      .catch(err => {
+        console.error("Error updating faculty:", err);
+        alert("Failed to update faculty.");
+      });
+    });
+  </script>
+</body>
+</html>

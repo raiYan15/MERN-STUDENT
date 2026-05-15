@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Progress Pie Chart</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 30px;
+      text-align: center;
+    }
+    canvas {
+      max-width: 600px;
+      margin: auto;
+    }
+    #error {
+      color: red;
+    }
+  </style>
+</head>
+<body>
+  <h2>Student Progress Summary</h2>
+  <canvas id="progressChart"></canvas>
+  <p id="error"></p>
+
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const parentid = urlParams.get('parentid');
+
+    if (!parentid) {
+      document.getElementById("error").textContent = "Missing parentid in URL.";
+    } else {
+      fetch(`http://localhost:5000/getnotes/${parentid}`)
+        .then(response => {
+          if (!response.ok) throw new Error("Failed to fetch progress notes");
+          return response.json();
+        })
+        .then(data => {
+          const typeCounts = {};
+
+          data.forEach(note => {
+            const type = note.type;
+            typeCounts[type] = (typeCounts[type] || 0) + 1;
+          });
+
+          const labels = Object.keys(typeCounts);
+          const counts = Object.values(typeCounts);
+
+          const ctx = document.getElementById('progressChart').getContext('2d');
+          new Chart(ctx, {
+            type: 'pie',
+            data: {
+              labels: labels,
+              datasets: [{
+                label: 'Progress Note Types',
+                data: counts,
+                backgroundColor: [
+                  'rgba(255, 99, 132, 0.6)',
+                  'rgba(54, 162, 235, 0.6)',
+                  'rgba(255, 206, 86, 0.6)',
+                  'rgba(75, 192, 192, 0.6)',
+                  'rgba(153, 102, 255, 0.6)',
+                  'rgba(255, 159, 64, 0.6)'
+                ],
+                borderWidth: 1
+              }]
+            },
+            options: {
+              responsive: true,
+              plugins: {
+                legend: {
+                  position: 'bottom'
+                }
+              }
+            }
+          });
+        })
+        .catch(error => {
+          document.getElementById("error").textContent = "Error loading data: " + error.message;
+        });
+    }
+  </script>
+</body>
+</html>
